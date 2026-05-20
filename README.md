@@ -5,13 +5,13 @@ A curated collection of security research skills designed for terminal-based AI 
 
 ## Overview
 
-This project provides structured security skills that work with [deepseek-tui](https://github.com/deepseek-ai/deepseek-tui), a terminal-based AI interface. Each skill covers a specific domain of security research with practical workflows, tool integrations, and actionable commands.
+This project provides structured security skills that work with [deepseek-tui](https://github.com/Hmbown/DeepSeek-TUI), a terminal-based AI interface. Each skill covers a specific domain of security research with practical workflows, tool integrations, and actionable commands.
 
 **Target Users:** Security researchers, penetration testers, bug bounty hunters
 
 **Requirements:**
 - Kali Linux (or Debian-based distribution)
-- [deepseek-tui](https://github.com/deepseek-ai/deepseek-tui)
+- [deepseek-tui](https://github.com/Hmbown/DeepSeek-TUI)
 - Python 3.11+
 - mitmproxy (for traffic analysis skills)
 
@@ -27,39 +27,6 @@ This project provides structured security skills that work with [deepseek-tui](h
 | **kali-web-pentest** | Kali web penetration testing tools quick reference |
 | **zeroday-hunting** | 0day vulnerability discovery paths and fuzzing workflows |
 
-## Quick Start
-
-### 1. Install Dependencies
-
-```bash
-# Install mitmproxy (required for traffic analysis)
-pip install mitmproxy
-
-# Install deepseek-tui
-git clone https://github.com/deepseek-ai/deepseek-tui
-cd deepseek-tui && ./install.sh
-```
-
-### 2. Clone This Repo
-
-```bash
-git clone https://github.com/YOUR_USERNAME/deepseek-sec-skills.git
-cd deepseek-sec-skills
-```
-
-### 3. Load a Skill
-
-In deepseek-tui, reference the skill directory:
-
-```
-@skill /path/to/deepseek-sec-skills/skills/aimitm
-```
-
-Or load the entire skills directory:
-
-```
-@skills /path/to/deepseek-sec-skills/skills
-```
 
 ## Project Structure
 
