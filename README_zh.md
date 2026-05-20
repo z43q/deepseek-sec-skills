@@ -6,13 +6,13 @@
 
 ## 简介
 
-本项目提供结构化的安全技能，与 [deepseek-tui](https://github.com/deepseek-ai/deepseek-tui)（终端 AI 交互界面）配合使用。每个技能覆盖安全研究的一个垂直领域，包含可落地的工作流、工具集成和实战命令。
+本项目提供结构化的安全技能，与 [deepseek-tui](https://github.com/Hmbown/DeepSeek-TUI)（终端 AI 交互界面）配合使用。每个技能覆盖安全研究的一个垂直领域，包含可落地的工作流、工具集成和实战命令。
 
 **目标用户：** 安全研究员、渗透测试工程师、SRC 漏洞挖掘者
 
 **环境依赖：**
 - Kali Linux（或基于 Debian 的发行版）
-- [deepseek-tui](https://github.com/deepseek-ai/deepseek-tui)
+- [deepseek-tui](https://github.com/Hmbown/DeepSeek-TUI)
 - Python 3.11+
 - mitmproxy（流量分析类技能需要）
 
@@ -27,40 +27,6 @@
 | **session-collaboration** | 多会话协作框架，支持团队安全测试分工 |
 | **kali-web-pentest** | Kali Web 渗透测试工具速查 |
 | **zeroday-hunting** | 0day 漏洞发现路径与模糊测试工作流 |
-
-## 快速上手
-
-### 1. 安装依赖
-
-```bash
-# 安装 mitmproxy（流量分析必需）
-pip install mitmproxy
-
-# 安装 deepseek-tui
-git clone https://github.com/deepseek-ai/deepseek-tui
-cd deepseek-tui && ./install.sh
-```
-
-### 2. 克隆本项目
-
-```bash
-git clone https://github.com/YOUR_USERNAME/deepseek-sec-skills.git
-cd deepseek-sec-skills
-```
-
-### 3. 加载技能
-
-在 deepseek-tui 中引用技能目录：
-
-```
-@skill /path/to/deepseek-sec-skills/skills/aimitm
-```
-
-或加载整个技能目录：
-
-```
-@skills /path/to/deepseek-sec-skills/skills
-```
 
 ## 项目结构
 
