@@ -1,4 +1,4 @@
-# DeepSeek Security Skills
+# DeepSeek Security Skills [English](README.md)
 
 > 面向 Kali Linux 的 AI 友好安全技能集 — 由 deepseek-tui 驱动
 
