@@ -1,0 +1,127 @@
+#!/bin/bash
+# aimitm — AI 友好 MITM 代理 CLI 入口
+# 用法:
+#   aimitm                          # 默认 8080 端口，stdout 输出所有流量
+#   aimitm -p 9090                  # 指定端口
+#   aimitm -h target.com            # 只输出目标主机
+#   aimitm -h target.com -n         # 不输出 body
+#   aimitm -h target.com -r rules.json  # 加载改包规则
+#   aimitm -h target.com -f 'status >= 400'  # 只看异常响应
+#   aimitm -o traffic.jsonl         # 输出到文件
+
+set -e
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+ADDON="$SCRIPT_DIR/aimitm.py"
+PORT=8080
+HOST=""
+PATH_PREFIX=""
+PATH_RE=""
+METHOD=""
+STATUS=""
+STATUS_MIN=""
+NO_BODY=""
+RULES_FILE=""
+OUTPUT=""
+QUIET=""
+UPSTREAM=""
+EXTRA=""
+
+usage() {
+    cat << 'EOF'
+aimitm — AI 友好的 MITM 代理
+
+用法: aimitm [选项]
+
+代理选项:
+  -p PORT       监听端口 (默认 8080)
+  -u UPSTREAM   上游代理 (如 http://127.0.0.1:7890)
+
+过滤选项:
+  -h HOST       只输出此主机
+  -P PATH       只输出此前缀路径
+  -R PATH_RE    正则匹配路径
+  -m METHOD     只输出此 HTTP 方法
+  -s STATUS     只输出此状态码
+  -S STATUS_MIN 状态码 >= 此值
+  -n            不输出 body
+  -q            静默模式 (无过滤时不输出)
+
+改包选项:
+  -r RULES      改包规则 JSON 文件
+
+输出选项:
+  -o FILE       输出到文件 (JSONL)
+  --redact      脱敏 Cookie/Authorization
+
+其他:
+  --no-http2    禁用 HTTP/2
+  --insecure    跳过 TLS 验证
+  -h, --help    帮助
+
+示例:
+  aimitm -p 8080 -h target.com
+  aimitm -h target.com -S 400 -n        # 只看 4xx/5xx 错误
+  aimitm -h target.com -r rules.json    # 改包模式
+  aimitm -h target.com -o out.jsonl &   # 后台运行输出到文件
+  tail -f out.jsonl | while read l; do echo "$l" | jq .url; done  # 实时监控
+EOF
+    exit 0
+}
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -p) PORT="$2"; shift 2 ;;
+        -h) HOST="$2"; shift 2 ;;
+        -P) PATH_PREFIX="$2"; shift 2 ;;
+        -R) PATH_RE="$2"; shift 2 ;;
+        -m) METHOD="$2"; shift 2 ;;
+        -s) STATUS="$2"; shift 2 ;;
+        -S) STATUS_MIN="$2"; shift 2 ;;
+        -n) NO_BODY=1; shift ;;
+        -q) QUIET=1; shift ;;
+        -r) RULES_FILE="$2"; shift 2 ;;
+        -o) OUTPUT="$2"; shift 2 ;;
+        -u) UPSTREAM="$2"; shift 2 ;;
+        --redact) REDACT=1; shift ;;
+        --no-http2) EXTRA="$EXTRA --no-http2"; shift ;;
+        --insecure) EXTRA="$EXTRA --ssl-insecure"; shift ;;
+        --help) usage ;;
+        *) echo "未知参数: $1"; usage ;;
+    esac
+done
+
+# 构建环境变量
+ENV=""
+[ -n "$HOST" ]        && ENV="$ENV AIMITM_HOST=$HOST"
+[ -n "$PATH_PREFIX" ] && ENV="$ENV AIMITM_PATH=$PATH_PREFIX"
+[ -n "$PATH_RE" ]     && ENV="$ENV AIMITM_PATH_RE=$PATH_RE"
+[ -n "$METHOD" ]      && ENV="$ENV AIMITM_METHOD=$METHOD"
+[ -n "$STATUS" ]      && ENV="$ENV AIMITM_STATUS=$STATUS"
+[ -n "$STATUS_MIN" ]  && ENV="$ENV AIMITM_STATUS_MIN=$STATUS_MIN"
+[ -n "$NO_BODY" ]     && ENV="$ENV AIMITM_NO_BODY=1"
+[ -n "$QUIET" ]       && ENV="$ENV AIMITM_QUIET=1"
+[ -n "$RULES_FILE" ]  && ENV="$ENV AIMITM_RULES_FILE=$RULES_FILE"
+[ -n "$OUTPUT" ]      && ENV="$ENV AIMITM_OUTPUT=$OUTPUT"
+[ -n "$REDACT" ]      && ENV="$ENV AIMITM_REDACT=1"
+
+# 上游代理
+if [ -n "$UPSTREAM" ]; then
+    EXTRA="$EXTRA --mode upstream:$UPSTREAM"
+fi
+
+# 启动
+echo "╔══════════════════════════════════════╗"
+echo "║  aimitm — AI MITM Proxy             ║"
+echo "╠══════════════════════════════════════╣"
+echo "║  端口: $PORT"
+[ -n "$HOST" ]        && echo "║  过滤主机: $HOST"
+[ -n "$PATH_PREFIX" ] && echo "║  过滤路径: $PATH_PREFIX"
+[ -n "$RULES_FILE" ]  && echo "║  改包规则: $RULES_FILE"
+[ -n "$OUTPUT" ]      && echo "║  输出文件: $OUTPUT"
+[ -n "$NO_BODY" ]     && echo "║  无 body 模式"
+echo "║  输出格式: JSONL (每行一个 JSON)"
+echo "╚══════════════════════════════════════╝"
+echo ""
+
+eval "exec env $ENV mitmdump -s '$ADDON' -p $PORT --set stream_large_bodies=10m $EXTRA"

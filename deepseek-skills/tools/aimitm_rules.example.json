@@ -1,0 +1,26 @@
+[
+  {
+    "_comment": "示例1: 给目标所有API请求加自定义头",
+    "match": {"host": "target.com", "path_re": "^/api/"},
+    "modify": {
+      "req_headers": {
+        "X-Forwarded-For": "127.0.0.1",
+        "X-aimitm": "modified-by-ai"
+      }
+    }
+  },
+  {
+    "_comment": "示例2: 替换响应中的敏感词（用于测试前端XSS过滤）",
+    "match": {"host": "target.com", "path_re": "^/api/"},
+    "modify": {
+      "res_body_replace": {"from": "admin", "to": "superadmin"}
+    }
+  },
+  {
+    "_comment": "示例3: 修改特定端点的请求体",
+    "match": {"host": "target.com", "path": "/api/login"},
+    "modify": {
+      "req_body_replace": {"from": "\"user\":\"admin\"", "to": "\"user\":\"superadmin\""}
+    }
+  }
+]
