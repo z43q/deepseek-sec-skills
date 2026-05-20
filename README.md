@@ -1,5 +1,5 @@
 # DeepSeek Security Skills
-
+[简体中文](README_zh.md)
 > AI-friendly security skills for Kali Linux — powered by deepseek-tui
 
 A curated collection of security research skills designed for terminal-based AI workflows. Built for ethical hacking and authorized security testing.
